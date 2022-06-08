@@ -1,6 +1,7 @@
 ## Standard lib functions
+## Utils
 choose(n,k) = factorial(n) / ( factorial(n - k) * factorial(k) )
-binomial(k,n,p) = choose(n, k) * p^k * (1 - p)^(n - k)
+binomial(k,n,p) = if k<=n then choose(n, k) * p^k * (1 - p)^(n - k) else 0
 laplace(s,n) = (s + 1) / ( n + 2)
 
 ## Current capital
@@ -20,23 +21,19 @@ expectedCurrentCapitalWithGrowth(t) = mean(currentCapitalWithGrowth(t))
 ## New money coming from billionnaires
 
 getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
-  ## chanceOfNewBillionnairePerYear can be a distribution!!
-  ## Whole number of years approximate as Binomial
   wholeNumberOfYears = floor(t)
   yearRemainder = t - floor(t)
   realisticNumBillionnaires = 100 ## 2668: forbes estimate
-  rangeNumBillionnaires = listMake(0, realisticNumBillionnaires)
-	numNewBillionnairesObj = rangeNumBillionnaires.map(n => 
-	  {
-			"x": n,
-		  "y": binomial(b,wholeNumberOfYears,chanceOfNewBillionnairePerYear)
-	  }
-	)
-	newBillionnairesDistFromBinomial = toSampleSet(probPerNumberOfNewBillionnaires) ## fromSampleSet??
-  
+  rangeNumBillionnaires = upTo(0, realisticNumBillionnaires)
+  numNewBillionnairesObj  = map(rangeNumBillionnaires, {|n| {
+      "x": n, 
+      "y":  binomial(n,wholeNumberOfYears,chanceOfNewBillionnairePerYear)
+  }})
+  newBillionnairesDistFromBinomial = fromXYShape(numNewBillionnairesObj) 
+	## fromXYShape: function does not yet exist
 	## Take into account remainder of year
 	newBillionnaireInRemainderOfYearProb = 1 - (1 - chanceOfNewBillionnairePerYear)^(1/yearRemainder)
-	newBillionnaireInRemainderOfYearDist = toSampleSet([
+	newBillionnaireInRemainderOfYearDist = fromXYShape([
 	  ({"x": 0, "y": 1 - newBillionnaireInRemainderOfYearProb }), 
     ({"x": 1, "y": newBillionnaireInRemainderOfYearProb})
 	])
