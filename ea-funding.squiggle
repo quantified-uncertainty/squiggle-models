@@ -1,0 +1,63 @@
+## Standard lib functions
+choose(n,k) = factorial(n)/(factorial(n-k) * factorial(k))
+binomial(k,n,p) = choose(n,k) * p^k * (1-p)^(n-k)
+laplace(s,n) = (s+1)/(n+2)
+
+## Current capital
+forbes_moskovitz_fortune = 11.2B // https://www.forbes.com/profile/dustin-moskovitz/
+moskovitz_fortune = 10B to 15B
+forbes_sbf_fortune = 20.6B // https://www.forbes.com/profile/sam-bankman-fried/
+sbf_fortune = 15B to 30B
+other_fortunes = 5B to 20B
+
+capital_0 = moskovitz_fortune + sbf_fortune + other_fortunes
+yearly_growth = (-0.1 to 0.15)
+growthByYear(t) = (1+yearly_growth)^t
+
+currentCapitalWithGrowth(t) = capital_0*growthByYear(t)
+expected_capital(t) = mean(capital(t))
+
+## New money coming from billionnaires
+
+chanceOfNewBillionnairePerYear = laplace(2,2022-2007) // 2 billionnaires now
+  // Maybe have a less optimistic scenario where this is lower?
+
+newBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
+  ## Whole number of years approximate as Binomial
+  wholeNumberOfYears = floor(t)
+  yearRemainder = t-floor(t)
+  realisticNumBillionnaires = 100 // 2668: forbes estimate
+  rangeNumBillionnaires = listMake(0, realisticNumBillionnaires)
+	numNewBillionnairesObj = rangeNumBillionnaires.map(n => 
+	  {
+			"x": n,
+		  "y": binomial(b,wholeNumberOfYears,chanceOfNewBillionnairePerYear)
+	  }
+	)
+	newBillionnairesDistFromBinomial = toSampleSet(probPerNumberOfNewBillionnaires) // fromSampleSet??
+  
+	## Take into account remainder of year
+	newBillionnaireInRemainderOfYearProb = 1- (1-chanceOfNewBillionnairePerYear)^(1/yearRemainder)
+	newBillionnaireInRemainderOfYearDist = toSampleSet([
+	  ({"x": 0, "y": 1-newBillionnaireInRemainderOfYearProb }), 
+    ({"x": 1, "y": newBillionnaireInRemainderOfYearProb})
+	])
+	
+  ## Sum both
+  newBillionnairesDist = newBillionnairesDistFromBinomial + newBillionnaireInRemainderOfYearDist
+  
+	## How rich is each billionnaires
+	billionareWealthDistribution = mx(1B to 10B, 1B to 100B, [0.7, 0.3]) * growthByYear(t)
+	
+  ## Combine numBillionnaires with billionareWealthDistribution to get final estimate
+	newCapital = newBillionnairesDist * billionareWealthDistribution
+
+	newCapital
+}
+newBillionnaireMoney
+
+## All together
+pNoNewBillionnairesEver = 0.2
+pLoseItAll = 0.01
+capital(t) = mx(0, currentCapitalWithGrowth(t), currentCapitalWithGrowth(t) + newBillionnaireMoney(t), [pLoseItAll, pNoNewBillionnairesEver, 1-pNoNewBillionnairesEver-pLoseItAll])
+capital
