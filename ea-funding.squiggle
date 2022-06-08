@@ -13,7 +13,8 @@ other_fortunes = mx(5B to 10B, 5B to 30B)
 
 capital_0 = moskovitz_fortune + sbf_fortune + other_fortunes
 yearly_growth = (-0.1 to 0.15) ## could be divided into different scenarios
-growthByYear(t) = (1 + yearly_growth)^t
+## yearly_growth = mx(0.01 to 0.08, (-0.1 to 0.15), [0.7, 0.3]) 
+growthByYear(t) = (1 + yearly_growth)^t ## Independently sampled
 
 currentCapitalWithGrowth(t) = capital_0 * growthByYear(t)
 expectedCurrentCapitalWithGrowth(t) = mean(currentCapitalWithGrowth(t))
@@ -23,6 +24,8 @@ expectedCurrentCapitalWithGrowth(t) = mean(currentCapitalWithGrowth(t))
 getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
   wholeNumberOfYears = floor(t)
   yearRemainder = t - floor(t)
+
+  ## Beginning of year
   realisticNumBillionnaires = 100 ## 2668: forbes estimate
   rangeNumBillionnaires = upTo(0, realisticNumBillionnaires)
   numNewBillionnairesObj  = map(rangeNumBillionnaires, {|n| {
@@ -31,7 +34,8 @@ getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
   }})
   newBillionnairesDistFromBinomial = fromXYShape(numNewBillionnairesObj) 
 	## fromXYShape: function does not yet exist
-	## Take into account remainder of year
+	
+	## Remainder of year
 	newBillionnaireInRemainderOfYearProb = 1 - (1 - chanceOfNewBillionnairePerYear)^(1/yearRemainder)
 	newBillionnaireInRemainderOfYearDist = fromXYShape([
 	  ({"x": 0, "y": 1 - newBillionnaireInRemainderOfYearProb }), 
