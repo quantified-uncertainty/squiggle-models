@@ -14,11 +14,11 @@ other_fortunes = mx(5B to 10B, 5B to 30B)
 capital_0 = moskovitz_fortune + sbf_fortune + other_fortunes
 return_rate = -0.1 to 0.15
 spending_percentage = 0.01 to 0.05
-yearly_growth = return_rate - spending_percentage 
-## currently 
+yearly_growth = return_rate - spending_percentage
+## currently
 ## could be divided into different scenarios
-## yearly_growth = mx(0.01 to 0.08, (-0.1 to 0.15), [0.7, 0.3]) 
-growthByYear(t) = (1 + yearly_growth)^t ## Independently sampled
+## yearly_growth = mx(0.01 to 0.08, (-0.1 to 0.15), [0.7, 0.3])
+growthByYear(t) = (1 + yearly_growth)^t ## Independently sampled!
 growthByYearWithoutSpending(t) = (1+return_rate)^t
 
 currentCapitalWithGrowth(t) = capital_0 * growthByYear(t)
@@ -31,54 +31,56 @@ getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
   yearRemainder = t - floor(t)
 
   ## Beginning of year
-  realisticNumBillionnaires = 100 ## 2668: forbes estimatec  
+  realisticNumBillionnaires = 100 ## 2668: forbes estimatec
   rangeNumBillionnaires = upTo(0, realisticNumBillionnaires)
   numNewBillionnairesObj  = map(rangeNumBillionnaires, {|n| {
-      "x": n, 
+      "x": n,
       "y":  binomial(n,wholeNumberOfYears,chanceOfNewBillionnairePerYear)
   }})
-  newBillionnairesDistFromBinomial = fromXYShape(numNewBillionnairesObj) 
+  newBillionnairesDistFromBinomial = toDiscretePointSet(numNewBillionnairesObj)
   ## fromXYShape: function does not yet exist
-  
+
   ## Remainder of year
   newBillionnaireInRemainderOfYearProb = 1 - (1 - chanceOfNewBillionnairePerYear)^(1/yearRemainder)
-  newBillionnaireInRemainderOfYearDist = fromXYShape([
-    ({"x": 0, "y": 1 - newBillionnaireInRemainderOfYearProb }), 
+  newBillionnaireInRemainderOfYearDist = toDiscretePointSet([
+    ({"x": 0, "y": 1 - newBillionnaireInRemainderOfYearProb }),
     ({"x": 1, "y": newBillionnaireInRemainderOfYearProb})
   ])
-  
+
   ## Sum both
   newBillionnairesDist = newBillionnairesDistFromBinomial + newBillionnaireInRemainderOfYearDist
-  
+
   ## How rich is each billionnaires
   newBillionareWealthDistribution = mx(1B to 10B, 1B to 100B, [0.7, 0.3]) * growthByYear(t)
   ## Note that this models the converted billionnaires as switching spending from personal consumption
   ## to altruistic spending, rather than not having spent anything before.
-  
+
   ## Combine numBillionnaires with billionareWealthDistribution to get final estimate
   newCapital = newBillionnairesDist * newBillionareWealthDistribution
 
   newCapital
+
 }
 
 ## Scenarios over new billionnaires per year
-pLoseItAll = 0.01
+pLoseItAll = 0 ## 0.01; 0 for display purposes.
 pNoNewBillionnairesEver = 0.2
 
 chanceOfNewBillionnairePerYearOptimistic = laplace(2, 2022 - 2007) ## 2 billionnaires since GiveWell -> ~0.17 = 17%/year
 chanceOfNewBillionnairesPerYearRealistic = laplace(2, 2022 - 1972) ## 2 billionnaires since Singer's Famine, Affluence and Morality -> ~0.05 = 5%/year
-chanceOfNewBillionnairePerYear = 0.05 to 0.17 ## overload the probability in the binomial!
-newBillionnaireMoney(t) = getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear)
-newBillionnaireMoney 
+chanceOfNewBillionnairePerYear = 0.05 to 0.17 ## toSampleSet(0.05 to 0.17) 
+## overload the probability in the binomial! <- would be cool, but not doing right now.
 
-probs = [pLoseItAll, pNoNewBillionnairesEver, 1 - pNoNewBillionnairesEver - pLoseItAll]
-capital(t) = mx(0, currentCapitalWithGrowth(t), currentCapitalWithGrowth(t) + newBillionnaireMoney(t), probs)
+newBillionnaireMoney(t) = getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYearOptimistic)
+probs = [pNoNewBillionnairesEver, 1 - pNoNewBillionnairesEver - pLoseItAll]
+capital(t) = mx(currentCapitalWithGrowth(t), currentCapitalWithGrowth(t) + newBillionnaireMoney(t), probs)
 expectedCapital(t) = mean(capital(t))
 
-## Display
-capital
-## expectedCapital
-
 ## Extra: Proportion of capital which is allocated to the most effective causes, full-stop.
-## hardcorePercentage = 0.05 to 0.5
-## hardcoreCapital(t) = hardcorePercentage * capital
+hardcorePercentage = 0.05 to 0.5
+hardcoreCapital(t) = hardcorePercentage * capital
+
+## Display
+# expectedCapital
+capital
+# hardcoreCapital
