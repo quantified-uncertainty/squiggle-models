@@ -36,13 +36,13 @@ powDependentSamples(dist, exponent) = {
 
 // Variables
 toyWorldVars = ({
-  "initialHumanPopulation": to(7.7B, 8.2B),
-  "humanPopulationGrowthPerYear":  to(-0.01, 0.05),
-  "yearlyEconomicGrowth": to(-0.05, 0.1),
-  "initialYearlyIncomeDistribution": to(200, 10k), 
-  "yearlyProbabilityOfXrisk":to(0.001, 0.05),
-  "yearsAfterWhichToyWorldFreezes": 100,
-  "discountRateAfterToyWorldFreezes": 0.05
+  initialHumanPopulation: to(7.7B, 8.2B),
+  humanPopulationGrowthPerYear:  to(-0.01, 0.05),
+  yearlyEconomicGrowth: to(-0.05, 0.1),
+  initialYearlyIncomeDistribution: to(200, 10k), 
+  yearlyProbabilityOfXrisk:to(0.001, 0.05),
+  yearsAfterWhichToyWorldFreezes: 100,
+  discountRateAfterToyWorldFreezes: 0.05
 })
 
 // Main
@@ -69,7 +69,8 @@ valueOfToyWorld(toyWorldVars) = {
   epsilonConsumptionDist = 0.001
   truncatedConsumptionDist(t) = truncateLeft(initialYearlyIncomeDistribution*economicGrowthByYear(t), epsilonConsumptionDist)
   estimatedValueOfYear(t) = log(truncatedConsumptionDist(t))
-  // estimatedValueOfYear
+  //
+  estimatedValueOfYear
   // estimatedValueOfYear(10)
   valueAtYear(t) = estimatedValueOfYear(t) * humanPopulation(t)
   
@@ -94,8 +95,15 @@ valueOfToyWorld(toyWorldVars) = {
   expectedDiscountedValueAfterwards = mean(discountedValueAfterwards)
   
   totalValueInToyWorld = totalValueInNextNYears+ expectedDiscountedValueAfterwards
-
-  totalValueInToyWorld
+  
+  result = {
+    totalValueInToyWorld: totalValueInToyWorld,
+    difference: totalValueInToyWorld - 19.3T,
+    valueAtYearIncludingXrisk: valueAtYearIncludingXrisk,
+    existentialRiskByYear: existentialRiskByYear,
+    valueAtYear:  valueAtYear,
+    humanPopulation: humanPopulation
+  }
 }
 
 valueOfToyWorld(toyWorldVars)
