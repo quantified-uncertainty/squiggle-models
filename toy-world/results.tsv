@@ -1,0 +1,17 @@
+description	value	difference	instructions 
+baseline world	19.3T	0	just apply model
+5% more growth per year	27.3T	7.84T	yearlyEconomicGrowth now to(-0.05, 0.1) + 0.05
+1% more growth per year	21.0T	1.46T	yearlyEconomicGrowth now to(-0.05, 0.1) + 0.01
+0.1% more growth per year	19.6T	0.26T	yearlyEconomicGrowth now to(-0.05, 0.1) + 0.001
+0.01% more growth per year	not distinguishable from baseline, ~0, yearlyEconomicGrowth now to(-0.05, 0.1) + 0.0001
+no existential risk, 33.8T	14.5T	yearlyProbabilityOfXrisk now delta(0)
+~1% less existential risk per year if possible	23.9T	4.63T	yearlyProbabilityOfXrisk now truncateLeft(to(0.001, 0.05) - 0.01, 0)
+halve existential risk per year	23.6T	4.28T	yearlyProbabilityOfXrisk now to(0.001, 0.05)/2
+reduce existential risk per year by 10%	20T	0.67T	yearlyProbabilityOfXrisk now to(0.001, 0.05)*0.9
+one-off doubling of consumption	20.8T	1.46T	initialYearlyIncomeDistribution now 2 * to(200, 10k)
+give $100 (adjusted with growth) to the bottom 5% per year forever	20.3T	0.99T	initialYearlyIncomeDistribution now mx(truncateRight(to(200, 10k), 200) + 100, truncateLeft(to(200, 10k), 200), [0.05, 0.95] )
+give $100 (adjusted with growth) to the bottom 1% per year forever	19.4T	0.1T	initialYearlyIncomeDistribution now  mx(truncateRight(to(200, 10k), inv(to(200, 10k), 0.01)) + 100, truncateLeft(to(200, 10k), inv(to(200, 10k), 0.01)), [0.01, 0.99] )
+give $100 to the bottom 5% for the first year as a one-off	19.4T	0.1T	initialYearlyIncomeDistribution now a function: initialYearlyIncomeDistributionFun(t) = if t<1 then mx(truncateRight(to(200, 10k), inv(to(200, 10k), 0.05)) + 100, truncateLeft(to(200, 10k), inv(to(200, 10k), 0.05)), [0.01, 0.99] ) else to(200, 10k); then change references to it when necessary.
+give $100 to the bottom 1% for the first year as a one-off	not distinguishable from baseline	~0 , initialYearlyIncomeDistribution now a function: initialYearlyIncomeDistributionFun(t) = if t<1 then mx(truncateRight(to(200, 10k), inv(to(200, 10k), 0.01)) + 100, truncateLeft(to(200, 10k), inv(to(200, 10k), 0.01)), [0.01, 0.99] ) else to(200, 10k); then change references to it when necessary.
+increase human population growth by 0.5%/year	28T	8.69T	humanPopulationGrowthPerYear now to(-0.01, 0.05) + 0.005
+increase human population growth by 0.1%/year	20.7T	1.39T humanPopulationGrowthPerYear now to(-0.01, 0.05) + 0.001
