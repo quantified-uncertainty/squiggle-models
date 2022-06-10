@@ -1,4 +1,4 @@
-description, value, difference, instructions, 
+description, value, difference, instructions 
 baseline world, 19.3T, 0, just apply model
 5% more growth per year, 27.3T, 7.84T, yearlyEconomicGrowth now to(-0.05, 0.1) + 0.05
 1% more growth per year, 21.0T, 1.46T, yearlyEconomicGrowth now to(-0.05, 0.1) + 0.01
