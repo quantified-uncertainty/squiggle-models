@@ -8,7 +8,7 @@ integrate(fun, min, max) = {
     l = max - min
     meanF(t) = mean(fun(t))
     intervals = map(upTo(0, (l/epsilon)), ({|n| min + n*epsilon}))
-    values = map(intervals, ({ |x | meanF(x)})) 
+    values = map(intervals, ({ |x | meanF(x)}))
     result = reduce(values, 0, ({|acc, x| acc + x})) * epsilon
     result
 }
@@ -17,7 +17,7 @@ powIndependentSamples(dist, exponent) = {
   n = floor(exponent)
   remainder = exponent - n
   helperList = upTo(1,n)
-  dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * toSampleSet(dist) }) 
+  dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * toSampleSet(dist) })
   dist_to_the_remainder = toSampleSet(dist)^remainder
   result = dist_to_the_nth_power * dist_to_the_remainder
   result
@@ -28,7 +28,7 @@ powDependentSamples(dist, exponent) = {
   n = floor(exponent)
   remainder = exponent - n
   helperList = upTo(1,n)
-  dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * distDependent }) 
+  dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * distDependent })
   dist_to_the_remainder = distDependent^remainder
   result = dist_to_the_nth_power * dist_to_the_remainder
   result
@@ -39,7 +39,7 @@ toyWorldVars = ({
   initialHumanPopulation: to(7.7B, 8.2B),
   humanPopulationGrowthPerYear:  to(-0.01, 0.05),
   yearlyEconomicGrowth: to(-0.05, 0.1),
-  initialYearlyIncomeDistribution: to(200, 10k), 
+  initialYearlyIncomeDistribution: to(200, 10k),
   yearlyProbabilityOfXrisk:to(0.001, 0.05),
   yearsAfterWhichToyWorldFreezes: 100,
   discountRateAfterToyWorldFreezes: 0.05
@@ -59,43 +59,43 @@ valueOfToyWorld(toyWorldVars) = {
   // Population
   humanPopulationGrowthByYear(t) = powIndependentSamples(1 + humanPopulationGrowthPerYear, t)
   humanPopulation(t) = initialHumanPopulation * humanPopulationGrowthByYear(t)
-  
+
   // EconomicGrowth
   yearlyGrowthAsMultiplier = 1 + yearlyEconomicGrowth
-  
+
   economicGrowthByYear(t) = powIndependentSamples(yearlyGrowthAsMultiplier, t)
   // Value of that population
-  
+
   epsilonConsumptionDist = 0.001
   truncatedConsumptionDist(t) = truncateLeft(initialYearlyIncomeDistribution*economicGrowthByYear(t), epsilonConsumptionDist)
   estimatedValueOfYear(t) = log(truncatedConsumptionDist(t))
   //
-  estimatedValueOfYear
+  
   // estimatedValueOfYear(10)
   valueAtYear(t) = estimatedValueOfYear(t) * humanPopulation(t)
-  
+
   // Probability of x-risk
   yearlySurvivalProbability = truncateLeft(1 - yearlyProbabilityOfXrisk, 0)
-  
+
   survivalProbabilitybyYear(t) = truncate(yearlySurvivalProbability^t, 0, 1)
   // survivalProbabilitybyYear(t) = truncateLeft(powDependentSamples(yearlySurvivalProbability, t),0)
-   
+
   existentialRiskByYear(t) = 1 - survivalProbabilitybyYear(t)
-  
+
   valueAtYearIncludingXrisk(t) = valueAtYear(t) * survivalProbabilitybyYear(t)
-  
+
   // Total value
   // Under the assumption that x-risk ends in 100 years either way,
   // and that we discount the remaining value at 5%/year (which is pretty brutal)
   freezeYear = yearsAfterWhichToyWorldFreezes
-  
+
   totalValueInNextNYears = integrate(valueAtYearIncludingXrisk, 0, freezeYear)
 
   discountedValueAfterwards = valueAtYear(freezeYear) * survivalProbabilitybyYear(freezeYear) / discountRateAfterToyWorldFreezes
   expectedDiscountedValueAfterwards = mean(discountedValueAfterwards)
-  
+
   totalValueInToyWorld = totalValueInNextNYears+ expectedDiscountedValueAfterwards
-  
+
   result = {
     totalValueInToyWorld: totalValueInToyWorld,
     difference: totalValueInToyWorld - 19.3T,
@@ -104,6 +104,8 @@ valueOfToyWorld(toyWorldVars) = {
     valueAtYear:  valueAtYear,
     humanPopulation: humanPopulation
   }
+  result
+  
 }
 
 valueOfToyWorld(toyWorldVars)
