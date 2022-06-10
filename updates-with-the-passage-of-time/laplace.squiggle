@@ -1,7 +1,7 @@
 // Vars
 numSuccesses = 0 
 numFailures = 10
-numTrials = num_successes + num_failures
+numTrials = numSuccesses + numFailures
 
 // Laplace formulas
 laplace(successes, failures) = (successes + 1)/( successes + failures + 2)
