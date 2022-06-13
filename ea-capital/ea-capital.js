@@ -5,9 +5,9 @@ binomial(k,n,p) = if k<=n then choose(n, k) * p^k * (1 - p)^(n - k) else 0
 laplace(s,n) = (s + 1) / ( n + 2)
 
 // Current capital
-forbes_moskovitz_fortune = 11.2B ## https:##www.forbes.com/profile/dustin-moskovitz/
+forbes_moskovitz_fortune = 11.2B // https://www.forbes.com/profile/dustin-moskovitz/
 moskovitz_fortune = 10B to 15B
-forbes_sbf_fortune = 20.6B ## https:##www.forbes.com/profile/sam-bankman-fried/
+forbes_sbf_fortune = 20.6B // https://www.forbes.com/profile/sam-bankman-fried/
 sbf_fortune = 15B to 30B
 other_fortunes = mx(5B to 10B, 5B to 30B)
 
@@ -18,7 +18,7 @@ yearly_growth = return_rate - spending_percentage
 // currently
 // could be divided into different scenarios
 // yearly_growth = mx(0.01 to 0.08, (-0.1 to 0.15), [0.7, 0.3])
-growthByYear(t) = (1 + yearly_growth)^t ## Independently sampled!
+growthByYear(t) = (1 + yearly_growth)^t // Independently sampled!
 growthByYearWithoutSpending(t) = (1+return_rate)^t
 
 currentCapitalWithGrowth(t) = capital_0 * growthByYear(t)
@@ -31,7 +31,7 @@ getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
   yearRemainder = t - floor(t)
 
   // Beginning of year
-  realisticNumBillionnaires = 100 ## 2668: forbes estimatec
+  realisticNumBillionnaires = 100 // 2668: forbes estimatec
   rangeNumBillionnaires = upTo(0, realisticNumBillionnaires)
   numNewBillionnairesObj  = map(rangeNumBillionnaires, {|n| {
       "x": n,
@@ -66,9 +66,9 @@ getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
 pLoseItAll = 0 // 0.01; 0 for display purposes.
 pNoNewBillionnairesEver = 0.2
 
-chanceOfNewBillionnairePerYearOptimistic = laplace(2, 2022 - 2007) ## 2 billionnaires since GiveWell -> ~0.17 = 17%/year
-chanceOfNewBillionnairesPerYearRealistic = laplace(2, 2022 - 1972) ## 2 billionnaires since Singer's Famine, Affluence and Morality -> ~0.05 = 5%/year
-chanceOfNewBillionnairePerYear = 0.05 to 0.17 ## toSampleSet(0.05 to 0.17) 
+chanceOfNewBillionnairePerYearOptimistic = laplace(2, 2022 - 2007) // 2 billionnaires since GiveWell -> ~0.17 = 17%/year
+chanceOfNewBillionnairesPerYearRealistic = laplace(2, 2022 - 1972) // 2 billionnaires since Singer's Famine, Affluence and Morality -> ~0.05 = 5%/year
+chanceOfNewBillionnairePerYear = 0.05 to 0.17 // toSampleSet(0.05 to 0.17) 
 // overload the probability in the binomial! <- would be cool, but not doing right now.
 
 newBillionnaireMoney(t) = getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYearOptimistic)
