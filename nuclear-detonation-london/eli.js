@@ -9,4 +9,4 @@ daysInYear=365
 lostDays=probabilityOfDying*remainingLifeExpectancyInYears*daysInYear
 
 lostHours=lostDays*24
-lostHours ## Replace with mean(lostDays) to get an estimate in days instead
+lostHours // Replace with mean(lostDays) to get an estimate in days instead
