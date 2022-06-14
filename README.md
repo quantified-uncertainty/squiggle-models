@@ -16,6 +16,8 @@ This is a repository containing example [Squiggle](https://www.squiggle-language
     - [] Have probability of getting a billionnaire be a distribution rather than a point
 - For toy world:
   - [ ] Add animals
+- [ ] Add laplace law estimates
+- [ ] Add criminal justice reform estimates
 - [ ] Look for other estimations which could add some strategic importance.
 
 ## Contributing
