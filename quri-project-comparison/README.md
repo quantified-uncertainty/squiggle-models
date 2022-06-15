@@ -4,5 +4,5 @@ This is a very rough estimate, by Ozzie, of the relative values of several of QU
 
 The data organized with Google sheets and ObservableJS.
 
-https://docs.google.com/spreadsheets/d/1nswHjbCPGleo8f2ZxpmKjoIKQY-z3RJ4Cs-upycu6m4/edit#gid=0
+https://docs.google.com/spreadsheets/d/1nswHjbCPGleo8f2ZxpmKjoIKQY-z3RJ4Cs-upycu6m4/edit#gid=0  
 https://observablehq.com/d/98cbe0073226a5f9
