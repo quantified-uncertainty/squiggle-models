@@ -1,0 +1,59 @@
+transformative_ai(t) = {
+    dist = mx(logistic(30,10), logistic(30,30),[.9,.4]) |> truncateLeft(0)
+    chance_will_happen_at_all = 0.8
+    cdf(dist,t) * chance_will_happen_at_all
+}
+
+ozzie_death(t) = {
+    dist = mx(logistic(25,13)) |> truncateLeft(0)
+    cdf(dist,t)
+}
+
+ozzie_relevant(t) = (1-ozzie_death(t)) * (1-transformative_ai(t))
+
+ozzie_age_of_death(t) = ozzie_death(t - 31)
+
+ozziesExpectedImpactOverTimeIfRelevant(t) = {
+    failedOutcome = .02 to .1
+    
+    tailToFailedWorld(impact) = {
+        proportionBelowZero = cdf(impact,0)
+        positiveImpact = impact |> truncateLeft(0) |> normalize
+        mx(failedOutcome, positiveImpact, [proportionBelowZero, 1-proportionBelowZero])
+    }
+
+    impactChange = {
+        to15: {|t| 1.15^(t+1)},
+        next20: {|t| 1.10^(t+1)},
+        last: {|t| 0.92^(t+1)}
+    }
+
+    expectedMean(t) = if t < 15
+        then impactChange.to15(t)
+        else if t < 35 then (impactChange.to15(15)*impactChange.next20(t-15))
+        else impactChange.to15(15) * impactChange.next20(20)*impactChange.last(t-35)
+    
+    expectedStdev(t) = .01+abs(expectedMean(t)*.1*1.15*t)
+    normal(expectedMean(t), expectedStdev(t)) |> tailToFailedWorld
+}
+
+ozziesExpectedImpactOverTime(t) = {
+    isRelevant = ozzie_relevant(t)
+    mx(0, ozziesExpectedImpactOverTimeIfRelevant(t), [1-isRelevant, isRelevant])
+}
+
+
+ozzie = {
+    death_chance_by_time: ozzie_death,
+    expectedImpactAtTime:ozziesExpectedImpactOverTime,
+    relevance: ozzie_relevant,
+    age_of_death: ozzie_age_of_death
+}
+
+impactOverTimeRelevance = {
+    valueConditionalOnRelevance: {|t| mean(ozziesExpectedImpactOverTimeIfRelevant(t))},
+    valueUnconditional: {|t| mean(ozziesExpectedImpactOverTime(t))},
+    isRelevant: ozzie_relevant
+}
+
+ozzie
