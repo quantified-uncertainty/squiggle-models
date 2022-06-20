@@ -1,0 +1,81 @@
+// The value of everything in a toy world.
+// as a function
+
+// Standard lib
+@import(utils.squiggle, utils)
+
+// Variables
+toyWorldVars = ({
+  initialHumanPopulation: to(7.7B, 8.2B),
+  humanPopulationGrowthPerYear:  to(-0.01, 0.05),
+  yearlyEconomicGrowth: to(-0.05, 0.1),
+  initialYearlyIncomeDistribution: to(200, 10k),
+  yearlyProbabilityOfXrisk:to(0.001, 0.05),
+  yearsAfterWhichToyWorldFreezes: 100,
+  discountRateAfterToyWorldFreezes: 0.05
+})
+
+// Main
+valueOfToyWorld(toyWorldVars) = {
+  // Initial variables
+  initialHumanPopulation = toyWorldVars["initialHumanPopulation"]
+  humanPopulationGrowthPerYear = toyWorldVars["humanPopulationGrowthPerYear"]
+  yearlyEconomicGrowth = toyWorldVars["yearlyEconomicGrowth"]
+  initialYearlyIncomeDistribution = toyWorldVars["initialYearlyIncomeDistribution"]
+  yearlyProbabilityOfXrisk = toyWorldVars["yearlyProbabilityOfXrisk"]
+  yearsAfterWhichToyWorldFreezes = toyWorldVars["yearsAfterWhichToyWorldFreezes"]
+  discountRateAfterToyWorldFreezes = toyWorldVars["discountRateAfterToyWorldFreezes"]
+
+  // Population
+  humanPopulationGrowthByYear(t) = utils.powIndependentSamples(1 + humanPopulationGrowthPerYear, t)
+  humanPopulation(t) = initialHumanPopulation * humanPopulationGrowthByYear(t)
+
+  // EconomicGrowth
+  yearlyGrowthAsMultiplier = 1 + yearlyEconomicGrowth
+
+  economicGrowthByYear(t) = utils.powIndependentSamples(yearlyGrowthAsMultiplier, t)
+  // Value of that population
+
+  epsilonConsumptionDist = 0.001
+  truncatedConsumptionDist(t) = truncateLeft(initialYearlyIncomeDistribution*economicGrowthByYear(t), epsilonConsumptionDist)
+  estimatedValueOfYear(t) = log(truncatedConsumptionDist(t))
+  //
+  
+  // estimatedValueOfYear(10)
+  valueAtYear(t) = estimatedValueOfYear(t) * humanPopulation(t)
+
+  // Probability of x-risk
+  yearlySurvivalProbability = truncateLeft(1 - yearlyProbabilityOfXrisk, 0)
+
+  survivalProbabilitybyYear(t) = truncate(yearlySurvivalProbability^t, 0, 1)
+  // survivalProbabilitybyYear(t) = truncateLeft(utils.powDependentSamples(yearlySurvivalProbability, t),0)
+
+  existentialRiskByYear(t) = 1 - survivalProbabilitybyYear(t)
+
+  valueAtYearIncludingXrisk(t) = valueAtYear(t) * survivalProbabilitybyYear(t)
+
+  // Total value
+  // Under the assumption that x-risk ends in 100 years either way,
+  // and that we discount the remaining value at 5%/year (which is pretty brutal)
+  freezeYear = yearsAfterWhichToyWorldFreezes
+
+  totalValueInNextNYears = utils.integrate(valueAtYearIncludingXrisk, 0, freezeYear, 1)
+
+  discountedValueAfterwards = valueAtYear(freezeYear) * survivalProbabilitybyYear(freezeYear) / discountRateAfterToyWorldFreezes
+  expectedDiscountedValueAfterwards = mean(discountedValueAfterwards)
+
+  totalValueInToyWorld = totalValueInNextNYears+ expectedDiscountedValueAfterwards
+
+  result = {
+    totalValueInToyWorld: totalValueInToyWorld,
+    difference: totalValueInToyWorld - 19.3T,
+    valueAtYearIncludingXrisk: valueAtYearIncludingXrisk,
+    existentialRiskByYear: existentialRiskByYear,
+    valueAtYear:  valueAtYear,
+    humanPopulation: humanPopulation
+  }
+  result
+  
+}
+
+valueOfToyWorld(toyWorldVars)

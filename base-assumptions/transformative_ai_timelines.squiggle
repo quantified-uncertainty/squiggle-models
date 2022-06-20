@@ -1,0 +1,5 @@
+{|t|
+    dist = mx(logistic(30,10), logistic(30,30),[.9,.4]) |> truncateLeft(0)
+    chance_will_happen_at_all = 0.8
+    cdf(dist,t) * chance_will_happen_at_all
+}

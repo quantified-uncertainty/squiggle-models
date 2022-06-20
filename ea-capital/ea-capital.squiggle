@@ -1,8 +1,51 @@
-// Standard lib functions
-// Utils
-choose(n,k) = factorial(n) / ( factorial(n - k) * factorial(k) )
-binomial(k,n,p) = if k<=n then choose(n, k) * p^k * (1 - p)^(n - k) else 0
-laplace(s,n) = (s + 1) / ( n + 2)
+utils = {
+  choose(n,k) = factorial(n) / ( factorial(n - k) * factorial(k) )
+
+  binomial(k,n,p) = if k<=n then choose(n, k) * p^k * (1 - p)^(n - k) else 0
+
+  laplace(s,n) = (s + 1) / ( n + 2)
+
+  integrate(fun, min, max, epsilon) = {
+    // assume that min and max are integers.
+    l = max - min
+    meanF(t) = mean(fun(t))
+    intervals = map(upTo(0, (l/epsilon)), ({|n| min + n*epsilon}))
+    values = map(intervals, ({ |x | meanF(x)}))
+    result = reduce(values, 0, ({|acc, x| acc + x})) * epsilon
+    result
+  }
+
+  powIndependentSamples(dist, exponent) = {
+    n = floor(exponent)
+    remainder = exponent - n
+    helperList = upTo(1,n)
+    dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * toSampleSet(dist) })
+    dist_to_the_remainder = toSampleSet(dist)^remainder
+    result = dist_to_the_nth_power * dist_to_the_remainder
+    result
+  }
+
+  powDependentSamples(dist, exponent) = {
+    distDependent = toSamplesSet(dist)
+    n = floor(exponent)
+    remainder = exponent - n
+    helperList = upTo(1,n)
+    dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * distDependent })
+    dist_to_the_remainder = distDependent^remainder
+    result = dist_to_the_nth_power * dist_to_the_remainder
+    result
+  }
+
+  {
+    choose: choose,
+    binomial: binomial,
+    laplace: laplace,
+    integrate: integrate,
+    powIndependentSamples: powIndependentSamples,
+    powDependentSamples: powDependentSamples
+  }
+}
+
 
 // Current capital
 forbes_moskovitz_fortune = 11.2B // https://www.forbes.com/profile/dustin-moskovitz/
@@ -35,7 +78,7 @@ getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
   rangeNumBillionnaires = upTo(0, realisticNumBillionnaires)
   numNewBillionnairesObj  = map(rangeNumBillionnaires, {|n| {
       "x": n,
-      "y":  binomial(n,wholeNumberOfYears,chanceOfNewBillionnairePerYear)
+      "y":  utils.binomial(n,wholeNumberOfYears,chanceOfNewBillionnairePerYear)
   }})
   newBillionnairesDistFromBinomial = toDiscretePointSet(numNewBillionnairesObj)
   // fromXYShape: function does not yet exist
@@ -66,8 +109,8 @@ getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYear) = {
 pLoseItAll = 0 // 0.01; 0 for display purposes.
 pNoNewBillionnairesEver = 0.2
 
-chanceOfNewBillionnairePerYearOptimistic = laplace(2, 2022 - 2007) // 2 billionnaires since GiveWell -> ~0.17 = 17%/year
-chanceOfNewBillionnairesPerYearRealistic = laplace(2, 2022 - 1972) // 2 billionnaires since Singer's Famine, Affluence and Morality -> ~0.05 = 5%/year
+chanceOfNewBillionnairePerYearOptimistic = utils.laplace(2, 2022 - 2007) // 2 billionnaires since GiveWell -> ~0.17 = 17%/year
+chanceOfNewBillionnairesPerYearRealistic = utils.laplace(2, 2022 - 1972) // 2 billionnaires since Singer's Famine, Affluence and Morality -> ~0.05 = 5%/year
 chanceOfNewBillionnairePerYear = 0.05 to 0.17 // toSampleSet(0.05 to 0.17) 
 // overload the probability in the binomial! <- would be cool, but not doing right now.
 
@@ -78,9 +121,9 @@ expectedCapital(t) = mean(capital(t))
 
 // Extra: Proportion of capital which is allocated to the most effective causes, full-stop.
 hardcorePercentage = 0.05 to 0.5
-hardcoreCapital(t) = hardcorePercentage * capital
+hardcoreCapital(t) = hardcorePercentage * capital(t)
 
 // Display
 // expectedCapital
-capital
+currentCapitalWithGrowth
 // hardcoreCapital
