@@ -3,3 +3,5 @@ notes.md
 
 ## Artifacts
 *.swp
+
+/node_modules/
