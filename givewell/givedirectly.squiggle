@@ -1,0 +1,58 @@
+# GiveWell model, from https://observablehq.com/@hazelfire/givewells-givedirectly-cost-effectiveness-analysis
+# More notes and descriptions in observable.
+transfer_efficiency = 0.75 to 0.9
+household_grant_size = 925 to 1125
+
+# Derived from bayesian update
+household_size = gamma(1061, 0.004431314623338257)
+size_of_transfer_per_person = household_grant_size / household_size
+portion_invested = beta(32, 50)
+amount_invested = portion_invested * size_of_transfer_per_person
+portion_consumed = 1 - portion_invested
+amount_consumed = portion_consumed * size_of_transfer_per_person
+
+# Defined from bayesian update
+baseline_consumption = toSampleSet(lognormal(5.6416553319135305, 0.013376219674031463))
+duration_of_initial_consumption = 0.5 to 3
+log_increase_in_initial_consumption = (log(amount_consumed / duration_of_initial_consumption + baseline_consumption) - log(baseline_consumption)) * duration_of_initial_consumption
+return_on_investment = 0.05 to 0.30
+increase_in_consumption_from_investments = return_on_investment * amount_invested
+log_increase_in_consumption_from_investment = log(increase_in_consumption_from_investments + baseline_consumption) - log(baseline_consumption)
+investment_duration = 3 to 15
+discount_rate = beta(10, 240)
+
+# Continuous PV, notes in observable
+pv(payment, discount, duration) = payment * (1 - (1 + discount) ^ (-duration)) / log(discount_rate + 1)
+present_value_excluding_last_year = pv(log_increase_in_consumption_from_investment, discount_rate, investment_duration - 1)
+percent_of_investment_returned = 0.05 to 0.2
+pv_consumption_last_year = (log(baseline_consumption + amount_invested * (return_on_investment + percent_of_investment_returned)) - log(baseline_consumption)) / (1 + discount_rate)^investment_duration
+total_pv_of_cash_transfer = pv_consumption_last_year + present_value_excluding_last_year + log_increase_in_initial_consumption
+factor_negative_spillover = 0.90 to 1
+value_after_discounting_spillover = factor_negative_spillover * total_pv_of_cash_transfer
+consumption_increase_per_household = value_after_discounting_spillover * household_size
+amount_of_transfers_per_dollar = transfer_efficiency / household_grant_size
+utility_per_dollar = amount_of_transfers_per_dollar * consumption_increase_per_household
+value_doubling_consumption = log(baseline_consumption * 2) - log(baseline_consumption)
+value_per_dollar = utility_per_dollar / value_doubling_consumption
+
+double_treatment = 1
+ineffective_goods = 1
+cash_doesnt_reach_participants = 1.03
+total_adjustment_for_risk_of_wastage = double_treatment * ineffective_goods * cash_doesnt_reach_participants
+misappropriation = 1
+bad_monitoring = 1
+total_adjustment_of_monitoring_and_evaluation = misappropriation * bad_monitoring
+change_of_priorities = 1
+non_funding_bottlenecks = 1
+within_org_fungibility = 1.05
+total_confidence_of_funds = change_of_priorities * non_funding_bottlenecks * within_org_fungibility
+total_charity_adjustment = total_adjustment_for_risk_of_wastage * total_adjustment_of_monitoring_and_evaluation * total_confidence_of_funds
+value_per_dollar_after_charity_adjustments = value_per_dollar / total_charity_adjustment
+
+changes_in_ppp = 0.93
+developmental_effects = 1.05
+reduced_morbidity = 1.04
+child_mortality_effects = 1.04
+total_adjustment_factor = changes_in_ppp * developmental_effects * reduced_morbidity * child_mortality_effects
+value_per_dollar_after_all_adjustments = total_adjustment_factor * value_per_dollar_after_charity_adjustments
+value_per_dollar_after_all_adjustments
