@@ -1,0 +1,13 @@
+{
+  "name": "squiggle-models",
+  "version": "0.0.1",
+  "author": "Quantified Uncertainty Research Institute",
+  "scripts": {
+    "compile": "squiggle-cli-experimental compile",
+    "watch": "squiggle-cli-experimental watch"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "squiggle-cli-experimental": "^0.0.3"
+  }
+}

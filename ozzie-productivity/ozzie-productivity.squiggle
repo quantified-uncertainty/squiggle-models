@@ -1,20 +1,23 @@
-transformative_ai(t) = {
-    dist = mx(logistic(30,10), logistic(30,30),[.9,.4]) |> truncateLeft(0)
-    chance_will_happen_at_all = 0.8
-    cdf(dist,t) * chance_will_happen_at_all
+transformative_ai_timelines = {
+  {|t|
+      dist = mx(logistic(30,10), logistic(30,30),[.9,.4]) |> truncateLeft(0)
+      chance_will_happen_at_all = 0.8
+      cdf(dist,t) * chance_will_happen_at_all
+  }
 }
+
 
 ozzie_death(t) = {
     dist = mx(logistic(25,13)) |> truncateLeft(0)
     cdf(dist,t)
 }
 
-ozzie_relevant(t) = (1-ozzie_death(t)) * (1-transformative_ai(t))
+ozzie_relevant(t) = (1-ozzie_death(t)) * (1-transformative_ai_timelines(t))
 
 ozzie_age_of_death(t) = ozzie_death(t - 31)
 
 ozziesExpectedImpactOverTimeIfRelevant(t) = {
-    failedOutcome = .02 to .1
+    failedOutcome = .02 to .2
     
     tailToFailedWorld(impact) = {
         proportionBelowZero = cdf(impact,0)
@@ -56,4 +59,4 @@ impactOverTimeRelevance = {
     isRelevant: ozzie_relevant
 }
 
-ozzie
+ozziesExpectedImpactOverTime

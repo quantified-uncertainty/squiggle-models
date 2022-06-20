@@ -27,3 +27,10 @@ Contributions are welcome!
 ## License
 
 Distributed under the MIT License.
+
+
+## Building
+
+If you are using files with imports, they should have the ``.squiggleU`` file syntax. 
+
+Run ``yarn run compile`` to build them into ``squiggle`` files.
