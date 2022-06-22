@@ -1,0 +1,28 @@
+getval = {|val| val.f(val.children) }
+getvalrecursive = {|children|
+        contents = values(children)
+        vals = map(contents, getval)
+        result = reduce(vals, 0, {|acc, val| acc + val})
+        result
+    }
+val = {
+    children: ({
+        a: {
+            children: {
+                value: 2
+            },
+            f: {|children| 3*children.value}
+        },
+        b: {
+            children: {
+                value: 1
+            },
+            f: {|children| 2*children.value}
+        }
+    }),
+    f: getvalrecursive
+}
+
+getval(val)
+
+// Actual example

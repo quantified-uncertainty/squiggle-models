@@ -1,0 +1,12 @@
+getval = {|val| val.f(val.children) }
+
+// Simple example I
+
+val = {
+    children: [1,2],
+    f: {|x| reduce(x, 0, {|acc, y| acc+y} )}
+}
+
+getval(val)
+
+// Simple example II

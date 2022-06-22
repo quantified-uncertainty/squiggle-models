@@ -1,0 +1,52 @@
+// Helpers
+sum = {|list| reduce(list, 0, {|acc, val| acc + val})}
+
+// Hierarchical lib
+getval = {|val| val.f(val) }
+getvalrecursive = {|children|
+        contents = values(children)
+        vals = map(contents, getval)
+        vals
+}
+
+// 
+utility = {
+    components: ({
+        now: {
+            numpeople: 8B,
+            avgConsumption: 200 to 10k, 
+            f: {|now| 
+                consumption = (now.numpeople * log(now.avgConsumption))
+                mean(consumption)
+            }
+        },
+        soon: {
+            value: 1,
+            numpeople: 16B,
+            avgConsumption: 200 to 10k, 
+            discount: {
+                xrisk: 0.5,
+                nonpatient: 0.05,
+                drift: 0.05,
+                f: {|discount|
+                    (1-discount.xrisk) * (1-discount.nonpatient)*(1-discount.drift)
+                }
+            },
+            f: {|soon| 
+                d = getval(soon.discount)
+                consumption = d*soon.numpeople*log(soon.avgConsumption)
+                mean(consumption)
+            }
+        },
+        later: {
+            value: 0,
+            f: {|b| b.value}
+        }
+    }),
+    f: {|utility|
+        utility.components |> getvalrecursive |> sum
+    }
+}
+
+getval(utility)
+

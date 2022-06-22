@@ -1,0 +1,20 @@
+getval = {|val| val.f(val.children) }
+
+val = {
+    children: ({
+        a: {
+            value: 1
+        },
+        b: {
+            value: 0.5
+        }
+    }),
+    f: {|children|
+        keys = keys(children)
+        vals = map(keys, {|key| children[key].value})
+        result = reduce(vals, 0, {|acc, val| acc + val})
+        result
+    }
+}
+
+getval(val)

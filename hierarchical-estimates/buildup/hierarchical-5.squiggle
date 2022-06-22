@@ -1,0 +1,25 @@
+getval = {|val| val.f(val) }
+sum = {|list| reduce(list, 0, {|acc, val| acc + val})}
+getvalrecursive = {|children|
+        contents = values(children)
+        vals = map(contents, getval)
+        vals
+}
+val = {
+    children: ({
+        a: {
+            value: 2,
+            f: {|a| a.value}
+        },
+        b: {
+            value: 1,
+            f: {|b| b.value}
+        }
+    }),
+    f: {|val|
+        val.children |> getvalrecursive |> sum
+    }
+}
+
+getval(val)
+
