@@ -8,7 +8,7 @@ getvalrecursive = {|children|
 val = {
     children: ({
         a: {
-            value: 2,
+            value: 4,
             f: {|a| a.value}
         },
         b: {
