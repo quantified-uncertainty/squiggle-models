@@ -1,5 +1,5 @@
 // Helpers
-zero = 0
+zero = normal(0, 0.0001)
 sum = {|list| reduce(list, zero, {|acc, val| acc + val})}
 
 // Hierarchical lib
@@ -14,25 +14,76 @@ getvalrecursive = {|children|
 utility = {
     components: {
         productivity: {
-            numpeople: uniform(15, 25),// at any one time
+            numpeople: truncate(normal(20,8),10,35),// at any one time
             duration: 2, // months
             numhoursbefore: 3.5 to 11.5,
             numhoursafter: 4 to 12,
-            effectivenessmultiplier: 0.5 to 5,
-            valueofwork: 2k to 100k, // in dollars/month of work
+            effectivenessmultiplierwhileinfellowship: 0.8 to 1.5, // during the fellowship
+            valueofwork: 2k to 100k,
+            // mx(2k to 100k, 50k to 5M, [0.9, 0.1]), if one wants to consider long tails.
+            // in dollars/month of work
             f: {|prod|
                 n = prod.numpeople
                 t = prod.duration
                 quantity = prod.numhoursafter/prod.numhoursbefore
-                quality = prod.effectivenessmultiplier
+                quality = prod.effectivenessmultiplierwhileinfellowship
                 mult = quantity * quality
                 val = prod.valueofwork
                 n * t * mult * val
                 // Produces fairly high estimates, not sure if overestimating smth
             }
         },
+        lifetimeboost: {
+            optimistic: {
+                numpeople: truncate(normal(20,8),10,35),// at any one time
+                proportionofpeopleforwhomboostispossible: truncate(normal(0.25, 0.2), 0, 0.4),
+                proportionofpeopleforwhomboosthappenscounterfactually: truncate(0.2 to 0.6, 0, 1),
+                effectivenessmultiplierinacceleratedyears: mx(1 to 1000, -1*(1 to 1000), [0.8, 0.2]) - 1,
+                accelerationinyears: truncateRight(0.2 to 5, 70),
+                yearlyvalue: 25k to 1M,
+                // mx(2k to 100k, 50k to 5M, [0.9, 0.1]), if one wants to consider long tails.
+                // in dollars/month of work
+                f: {|prod|
+                    n = prod.numpeople
+                    p1 = prod.proportionofpeopleforwhomboostispossible
+                    p2 = prod.proportionofpeopleforwhomboosthappenscounterfactually
+                    e = prod.effectivenessmultiplierinacceleratedyears
+                    t = prod.accelerationinyears
+                    v = prod.yearlyvalue
+                    n * p1 * p2 * e * t * v
+                    // Produces fairly high estimates, not sure if overestimating smth
+                }
+            },
+            pessimistic: {
+                numpeople: truncate(normal(20,8),10,35),// at any one time
+                proportionofpeopleforwhomboostispossible: truncate(0.005 to 0.05, 0, 1),
+                proportionofpeopleforwhomboosthappenscounterfactually: truncate(0.1 to 0.2, 0, 1),
+                effectivenessmultiplierinacceleratedyears: mx(1 to 100, -1*(1 to 100), [0.8, 0.2]) - 1,
+                accelerationinyears: truncateRight(0.2 to 2, 70),
+                yearlyvalue: 100k to 5M,
+                // mx(2k to 100k, 50k to 5M, [0.9, 0.1]), if one wants to consider long tails.
+                // in dollars/month of work
+                f: {|prod|
+                    n = prod.numpeople
+                    p1 = prod.proportionofpeopleforwhomboostispossible
+                    p2 = prod.proportionofpeopleforwhomboosthappenscounterfactually
+                    e = prod.effectivenessmultiplierinacceleratedyears
+                    t = prod.accelerationinyears
+                    v = prod.yearlyvalue
+                    n * p1 * p2 * e * t * v
+                    // Produces fairly high estimates, not sure if overestimating smth
+                }
+            },
+            f: {|boost|
+                optimistic = getval(boost.optimistic)
+                pessimistic = getval(boost.pessimistic)
+                mx(optimistic, pessimistic, [0.5, 0.5])
+                // pessimistic
+                
+            }
+        },
         collaborations: {
-            numpeople: uniform(15, 25), // at any one day
+            numpeople: truncate(normal(20,8),10,35), // at any one day
             colaborationprobperday: 0.01 to 0.1, // how many pairs of people?
             colaborationvalue: 500 to 100k, // in dollars
             duration: 2, //months
@@ -61,21 +112,21 @@ utility = {
             }
         },
         infrastructure: {
-            probhappeningagain: uniform(0.5, 0.8),
-            probagainandagain: uniform(0.1, 0.5),
-            multiplierimprovementifagain: normal(1.25, 0.25),
+            probhappeningagain: truncate(normal(0.65, 0.15),0.4, 0.9), // uniform(0.5, 0.8),
+            probagainandagain: truncate(normal(0.3, 0.15),0, 0.6), //uniform(0.1, 0.5),
+            multiplierimprovementifagain: normal(0.25, 0.25),
             f: {|infra| 
                 p1 = infra.probhappeningagain
                 p2 = infra.probagainandagain
                 m = infra.multiplierimprovementifagain
-                (1 + p1 + 2*p2)*m
+                (1 + p1 + 2*p2)*(1+m)
             }
         },
         bigfish: {
             comment: "I don't know how to model this",
             probbigfish: 0.003 to 0.03,
             probpivotalbigfish: 0.01 to 0.1,
-            valuebigfish: 1k to 100k,
+            valuebigfish: mx(1k to 100k, 10k to 1M, [0.95, 0.05]),
             duration: 2, //months
             f: {|bigfish|
                 p1 = bigfish.probbigfish
@@ -94,11 +145,17 @@ utility = {
         social = getval(components.social)
         infra = getval(components.infrastructure)
         bigfish = getval(components.bigfish)
+        lifetimeboost = getval(components.lifetimeboost)
         // ...
         
-        (productivity + collaborations + social + bigfish)*infra
+        (productivity + collaborations + social + bigfish + lifetimeboost)*infra
     }
     
 }
 
-getval(utility)
+val = getval(utility)
+
+// Display 
+val
+// truncate(val, 0, 1G)
+// ^ Only for display; removes the tail!
