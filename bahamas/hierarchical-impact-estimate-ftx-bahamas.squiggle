@@ -14,7 +14,7 @@ getvalrecursive = {|children|
 utility = {
     components: {
         productivity: {
-            numpeople: 20 to 30,// at any one time
+            numpeople: 10 to 30,// at any one time
             duration: 6, // months
             numhoursbefore: 4 to 12,
             numhoursafter: 6 to 12,
