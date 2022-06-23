@@ -1,0 +1,104 @@
+// Helpers
+zero = 0
+sum = {|list| reduce(list, zero, {|acc, val| acc + val})}
+
+// Hierarchical lib
+getval = {|val| val.f(val) }
+getvalrecursive = {|children|
+        contents = values(children)
+        vals = map(contents, getval)
+        vals
+}
+
+// Utility
+utility = {
+    components: {
+        productivity: {
+            numpeople: uniform(15, 25),// at any one time
+            duration: 2, // months
+            numhoursbefore: 3.5 to 11.5,
+            numhoursafter: 4 to 12,
+            effectivenessmultiplier: 0.5 to 5,
+            valueofwork: 2k to 100k, // in dollars/month of work
+            f: {|prod|
+                n = prod.numpeople
+                t = prod.duration
+                quantity = prod.numhoursafter/prod.numhoursbefore
+                quality = prod.effectivenessmultiplier
+                mult = quantity * quality
+                val = prod.valueofwork
+                n * t * mult * val
+                // Produces fairly high estimates, not sure if overestimating smth
+            }
+        },
+        collaborations: {
+            numpeople: uniform(15, 25), // at any one day
+            colaborationprobperday: 0.01 to 0.1, // how many pairs of people?
+            colaborationvalue: 500 to 100k, // in dollars
+            duration: 2, //months
+            f: {|colab|
+                p = colab.colaborationprobperday
+                val = colab.colaborationvalue
+                t = colab.duration * 30 // 30 days/month
+                // note that this doesn't take into account the amount of people; 
+                // that's implicit in the probability of a collaboration per day.
+                // also produces pretty large amounts
+                p*val*t
+            }
+        },
+        social: {
+            probturningevil: 0.001 to 0.01,
+            probpreventingevil: 0.001 to 0.01,
+            valuegoodsocialinteraction: 0,
+            ftxfortune: 10B to 40B,
+            socialvalueinitself: 0, // room for disagreement here.
+            f: {|social|
+                e = social.probturningevil
+                p = social.probpreventingevil
+                d = social.ftxfortune
+                s = social.socialvalueinitself
+                e * p * d + s
+            }
+        },
+        infrastructure: {
+            probhappeningagain: uniform(0.5, 0.8),
+            probagainandagain: uniform(0.1, 0.5),
+            multiplierimprovementifagain: normal(1.25, 0.25),
+            f: {|infra| 
+                p1 = infra.probhappeningagain
+                p2 = infra.probagainandagain
+                m = infra.multiplierimprovementifagain
+                (1 + p1 + 2*p2)*m
+            }
+        },
+        bigfish: {
+            comment: "I don't know how to model this",
+            probbigfish: 0.003 to 0.03,
+            probpivotalbigfish: 0.01 to 0.1,
+            valuebigfish: 1k to 100k,
+            duration: 2, //months
+            f: {|bigfish|
+                p1 = bigfish.probbigfish
+                p2 = bigfish.probpivotalbigfish
+                v = bigfish.valuebigfish
+                d = bigfish.duration * 30 // 30 days/month
+                p1 * p2 * v
+            }
+        }
+    },
+    f: {|utility|
+        components = utility.components
+        
+        productivity = getval(components.productivity)
+        collaborations = getval(components.collaborations)
+        social = getval(components.social)
+        infra = getval(components.infrastructure)
+        bigfish = getval(components.bigfish)
+        // ...
+        
+        (productivity + collaborations + social + bigfish)*infra
+    }
+    
+}
+
+getval(utility)
