@@ -10,7 +10,7 @@ getvalrecursive = {|children|
         vals
 }
 
-// 
+// Utility
 utility = {
     components: {
         productivity: {
@@ -21,7 +21,6 @@ utility = {
             effectivenessmultiplier: 0.5 to 3,
             valueofwork: 2k to 100k, // in dollars/month of work
             f: {|prod|
-                // New model: 
                 n = prod.numpeople
                 t = prod.duration
                 quantity = prod.numhoursafter/prod.numhoursbefore
@@ -29,6 +28,7 @@ utility = {
                 mult = quantity * quality
                 val = prod.valueofwork
                 n * t * mult * val
+                // Produces fairly high estimates, not sure if overestimating smth
             }
         },
         collaborations: {
@@ -40,7 +40,9 @@ utility = {
                 p = colab.colaborationprobperday
                 val = colab.colaborationvalue
                 t = colab.duration * 30 // 30 days/month
-                // note that this doesn't take into account the amount of people; that's implicit in the probability of a collaboration per day.
+                // note that this doesn't take into account the amount of people; 
+                // that's implicit in the probability of a collaboration per day.
+                // also produces pretty large amounts
                 p*val*t
             }
         },
@@ -82,8 +84,8 @@ utility = {
         productivity = getval(components.productivity)
         collaborations = getval(components.collaborations)
         social = getval(components.social)
-        bigfish = getval(components.bigfish)
         infra = getval(components.infrastructure)
+        bigfish = getval(components.bigfish)
         // ...
         
         (productivity + collaborations + social + bigfish)*infra
