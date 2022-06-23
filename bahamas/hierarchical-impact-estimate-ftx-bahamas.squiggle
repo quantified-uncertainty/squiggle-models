@@ -1,5 +1,4 @@
 // Helpers
-epsilon = 0.00001
 zero = 0
 sum = {|list| reduce(list, zero, {|acc, val| acc + val})}
 
