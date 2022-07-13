@@ -88,7 +88,12 @@ utility = {
         bigfish = getval(components.bigfish)
         // ...
         
-        (productivity + collaborations + social + bigfish)*infra
+        //{
+        //    result: (productivity + collaborations + social + bigfish)*infra,
+        //    components: components
+        //}
+        result = (productivity + collaborations + social + bigfish)*infra
+        result
     }
     
 }

@@ -1,0 +1,24 @@
+chance_of_direct_nato_confrontation = 0.005 to 0.05
+and_use_of_nuclear_weapons_in_Europe = 0.01 to 0.2
+and_use_of_nuclear_weapons_in_London = 0.05 to 0.3
+
+use_of_nuclear_weapons_in_London = chance_of_direct_nato_confrontation * 
+  and_use_of_nuclear_weapons_in_Europe * 
+  and_use_of_nuclear_weapons_in_London
+
+yearly_probability = mean(use_of_nuclear_weapons_in_London)
+monthly_probability = 1 - (1 - yearly_probability)^(1/12)
+
+remaining_life_expectancy_in_years = 40 to 60
+days_in_a_year = 365
+hours_in_a_day = 24
+
+expected_lost_hours = monthly_probability * remaining_life_expectancy_in_years * days_in_a_year * hours_in_a_day
+
+{
+	yearly_probability: yearly_probability,
+	monthly_probability: monthly_probability,
+  expected_lost_hours: expected_lost_hours, 
+  mean_expected_lost_hours: mean(expected_lost_hours)
+}
+

@@ -63,7 +63,7 @@ toyWorldVars = ({
 })
 
 // Main
-valueOfToyWorld(toyWorldVars) = {
+valueOfToyWorld(toyWorldVars) = { 
   // Initial variables
   initialHumanPopulation = toyWorldVars["initialHumanPopulation"]
   humanPopulationGrowthPerYear = toyWorldVars["humanPopulationGrowthPerYear"]
@@ -77,7 +77,7 @@ valueOfToyWorld(toyWorldVars) = {
   humanPopulationGrowthByYear(t) = utils.powIndependentSamples(1 + humanPopulationGrowthPerYear, t)
   humanPopulation(t) = initialHumanPopulation * humanPopulationGrowthByYear(t)
 
-  // EconomicGrowth
+  // EconomicGrowth 
   yearlyGrowthAsMultiplier = 1 + yearlyEconomicGrowth
 
   economicGrowthByYear(t) = utils.powIndependentSamples(yearlyGrowthAsMultiplier, t)
@@ -123,6 +123,6 @@ valueOfToyWorld(toyWorldVars) = {
   }
   result
   
-}
+} 
 
 valueOfToyWorld(toyWorldVars)

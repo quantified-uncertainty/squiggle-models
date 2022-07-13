@@ -1,0 +1,26 @@
+// Define the log-uniform
+// (<https://en.wikipedia.org/wiki/Reciprocal_distribution>)
+loguniform(a, b) = exp(uniform(log(a), log(b)))
+
+// Estimates
+rate_of_formation_of_stars = loguniform(1,100)
+fraction_of_stars_with_planetary_systems = loguniform(0.1, 1)
+number_of_planets_per_solar_system_good_for_life = loguniform(0.1, 1)
+fraction_of_planets_in_which_any_life_appears = 0.5 
+// ^ lognormal({mean:0.5, stdev: 50}) ?? 
+// ^ Couldn't figure it out, just used the point estimate
+// ^ and emailed the authors.
+fraction_of_planets_in_which_intelligent_life_appears = loguniform(0.001, 1)
+fraction_of_planets_which_dispatch_signals = loguniform(0.01, 1)
+length_of_time_signals_are_dispatched =  loguniform(100, 10000000000)
+
+// Number of planets with life we should observe
+n = rate_of_formation_of_stars *
+  fraction_of_stars_with_planetary_systems *
+  number_of_planets_per_solar_system_good_for_life * 
+  fraction_of_planets_in_which_any_life_appears * 
+  fraction_of_planets_in_which_intelligent_life_appears * 
+  fraction_of_planets_which_dispatch_signals *
+  length_of_time_signals_are_dispatched
+ 
+n

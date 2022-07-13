@@ -1,18 +1,23 @@
 firstYearRussianNuclearWeapons = 1953
 currentYear = 2022
-laplace(firstYear, yearNow) = 1/(yearNow-firstYear+2)
+laplacePseudoCount = 0 // could be different if one had a more confident prior.
+laplace(firstYear, yearNow) = (1)/(yearNow-firstYear+laplacePseudoCount+2)
 laplacePrediction= (1-(1-laplace(firstYearRussianNuclearWeapons, currentYear))^(1/12))
-laplaceMultiplier = 0.5 # Laplace tends to overestimate stuff
-russiaNatoNuclearexchangeInNextMonth=laplaceMultiplier*laplacePrediction
+laplaceMultiplier = 0.5 // Laplace tends to overestimate stuff
+russiaNatoNuclearexchangeInNextMonth= laplaceMultiplier * laplacePrediction
 
-londonHitConditional = 0.16 # personally at 0.05, but taking the aggregate here.
+londonHitConditional = 0.16 // personally at 0.05, but taking the aggregate here.
 informedActorsNotAbleToEscape = 0.2 to 0.8
 proportionWhichDieIfBombDropsInLondon = 0.6 to 1
-probabilityOfDying = russiaNatoNuclearexchangeInNextMonth*londonHitConditional*informedActorsNotAbleToEscape*proportionWhichDieIfBombDropsInLondon
+probabilityOfDying = 
+    russiaNatoNuclearexchangeInNextMonth * 
+    londonHitConditional * 
+    informedActorsNotAbleToEscape * 
+    proportionWhichDieIfBombDropsInLondon
 
 remainlingLifeExpectancyInYears = 40 to 60
 daysInYear=365
-lostDays=probabilityOfDying*remainlingLifeExpectancyInYears*daysInYear
+lostDays=probabilityOfDying * remainlingLifeExpectancyInYears * daysInYear
 
-lostHours=lostDays*24
+lostHours=lostDays * 24
 lostHours // Replace with mean(lostDays) to get an estimate in days instead

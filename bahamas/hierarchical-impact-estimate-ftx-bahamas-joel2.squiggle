@@ -1,0 +1,174 @@
+// Helpers
+zero = normal(0, 0.0001)
+sum = {|list| reduce(list, zero, {|acc, val| acc + val})}
+
+// Functions
+choose(n,k) = factorial(n) / ( factorial(n - k) * factorial(k) )
+binomial(k,n,p) = if k<=n then choose(n, k) * p^k * (1 - p)^(n - k) else 0
+
+// Hierarchical lib
+getval = {|val| val.f(val) }
+getvalrecursive = {|children|
+        contents = values(children)
+        vals = map(contents, getval)
+        vals
+}
+
+// Utility
+utility = {
+    components: {
+        productivity: {
+            numpeople: truncate(normal(20,8),10,35),// at any one time
+            travel: (2 / 50) * truncate(normal(1, 0.1),0,1),
+            duration: 2, // months
+            numhoursbefore: truncate(3 to 9, 0, 16),
+            numhoursafter: truncate(3.1 to 9.3, 0, 16),
+            effectivenessmultiplierwhileinfellowship: 0.8 to 1.5, // during the fellowship
+            valueofwork: mx(2k to 100k, 2k to 500k, [0.9, 0.1]),
+            // mx(2k to 100k, 50k to 5M, [0.9, 0.1]), if one wants to consider long tails.
+            // in dollars/month of work
+            f: {|prod|
+                n = prod.numpeople
+                d = prod.duration
+                t = prod.travel
+                quantity = prod.numhoursafter/prod.numhoursbefore
+                quality = prod.effectivenessmultiplierwhileinfellowship
+                mult = quantity * quality 
+                val = prod.valueofwork
+                n * (d - t) * mult * val
+                // Produces fairly high estimates, not sure if overestimating smth
+            }
+        },
+        lifetimeboost: {
+            numpeople: truncate(normal(20,8),10,35),// at any one time
+            proportionofpeopleforwhomboostispossible: truncate(normal(0.15, 0.2), 0, 0.4),
+            proportionofpeopleforwhomboosthappenscounterfactually: truncate(0.1 to 0.5, 0, 1),
+            effectivenessmultiplierinacceleratedyears: mx(1 to 100, -1*(1 to 300), [0.9, 0.1]) - 1,
+            accelerationinyears: truncateRight(0.2 to 2, 70),
+            yearlyvalue: mx(25k to 1M, 25k to 5M, [0.9, 0.1]),
+            // mx(2k to 100k, 50k to 5M, [0.9, 0.1]), if one wants to consider long tails.
+            // in dollars/month of work
+            f: {|boost|
+                n = boost.numpeople
+                p1 = boost.proportionofpeopleforwhomboostispossible
+                p2 = boost.proportionofpeopleforwhomboosthappenscounterfactually
+                e = boost.effectivenessmultiplierinacceleratedyears
+                t = boost.accelerationinyears
+                v = boost.yearlyvalue
+                n * p1 * p2 * e * t * v
+                // Produces fairly high estimates, not sure if overestimating smth
+            }
+        },
+        collaborations: {
+            numpeople: truncate(normal(20,8),10,35),// at any one time
+            rangenumpeople: upTo(10, 35),
+            //numpairs: numpeople! / (2! * (numpeople - 2)!),
+            colaborationprobperpairperday: 0.0002 to 0.003, // how many pairs of people?
+            colaborationcounterfactual: truncate(normal(0.3,0.6), 0, 1),
+            colaborationvalue: mx(1k to 100k, 1k to 10M, [0.9, 0.1]), // in dollars
+            colaborationprobstayedhome: 0.0001 to 0.002,
+            colaborationvaluestayedhome: mx(1k to 100k, 1k to 10M, [0.95, 0.05]), // in dollars
+            duration: 2, //months
+            f: {|colab|
+                //n = choose(numpeople, 2)
+                n = 200
+                p = colab.colaborationprobperpairperday
+                cf = colab.colaborationcounterfactual
+                val = colab.colaborationvalue
+                phome = colab.colaborationprobstayedhome
+                valhome = colab.colaborationvaluestayedhome
+                t = colab.duration * 30 // 30 days/month
+                // note that this doesn't take into account the amount of people; 
+                // that's implicit in the probability of a collaboration per day.
+                // also produces pretty large amounts
+                n*(cf*p*val - phome*valhome)*t
+            }
+        },
+        social: {
+            probturningevil: 0.001 to 0.01,
+            probpreventingevil: 0.0001 to 0.001,
+            valuegoodsocialinteraction: 0,
+            ftxfortune: 10B to 40B,
+            socialvalueinitself: 0, // room for disagreement here.
+            f: {|social|
+                e = social.probturningevil
+                p = social.probpreventingevil
+                d = social.ftxfortune
+                s = social.socialvalueinitself
+                e * p * d + s
+            }
+            
+        },
+        bigfish: {
+            // this should be poisson
+            numbigfish: truncate(normal(25,10),10,50),// at any one time
+            probbigfish: truncate(0.01 to 0.1, 0, 1),
+            probpivotalbigfish: truncate(0.05 to 0.2, 0, 1),
+            valuebigfish: mx(1k to 100k, 1k to 1M, [0.95, 0.05]),
+            duration: 2, //months
+            f: {|bigfish|
+                n = bigfish.numbigfish
+                p1 = bigfish.probbigfish
+                p2 = bigfish.probpivotalbigfish
+                v = bigfish.valuebigfish
+                d = bigfish.duration // 30 days/month
+                n * p1 * p2 * v * d
+            }
+        },
+        infrastructure: {
+            probhappeningagain: truncate(normal(0.8, 0.15),0, 1), // uniform(0.5, 0.8),
+            probagainandagain: truncate(normal(0.3, 0.15),0, 1), //uniform(0.1, 0.5),
+            multiplierimprovementifagain: 0.1 to 0.3,
+            f: {|infra| 
+                p1 = infra.probhappeningagain
+                p2 = infra.probagainandagain
+                m = infra.multiplierimprovementifagain
+                (1 + p1 + 2*p2)*(1+m)
+            }
+        },
+        damage: {
+            quantity_EAreputation: mx(1k to 1M, 1k to 50M, [0.6, 0.4]),
+            probability_EAreputation: truncate(0.05 to 0.5, 0, 1),
+            f: {|damage| 
+                q_r = damage.quantity_EAreputation
+                p_r = damage.probability_EAreputation
+                q_r * p_r
+            }
+        }
+    },
+    f: {|utility|
+        components = utility.components
+        
+        productivity = getval(components.productivity)
+        collaborations = getval(components.collaborations)
+        social = getval(components.social)
+        infra = getval(components.infrastructure)
+        bigfish = getval(components.bigfish)
+        lifetimeboost = getval(components.lifetimeboost)
+        damage = getval(components.damage)
+        // ...
+        
+        (productivity + collaborations + social + bigfish + lifetimeboost - damage)*infra
+    }
+    
+}
+
+val = getval(utility)
+
+// Display 
+//getval(utility.components.collaborations)
+//components = utility.components
+//{
+//  prod: getval(components.productivity),
+//  collab: getval(components.collaborations),
+//  social: getval(components.social),
+//  bigfish: getval(components.bigfish),
+//  boost: getval(components.lifetimeboost),
+//  damage: getval(components.damage),
+//  infra: getval(components.infrastructure)
+//}
+
+val
+
+//truncate(val, -0.8G, 1G)
+// ^ Only for display; removes the tail!
