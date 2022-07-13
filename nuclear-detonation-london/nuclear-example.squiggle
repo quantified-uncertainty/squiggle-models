@@ -16,8 +16,8 @@ hours_in_a_day = 24
 expected_lost_hours = monthly_probability * remaining_life_expectancy_in_years * days_in_a_year * hours_in_a_day
 
 {
-	yearly_probability: yearly_probability,
-	monthly_probability: monthly_probability,
+  yearly_probability: yearly_probability,
+  monthly_probability: monthly_probability,
   expected_lost_hours: expected_lost_hours, 
   mean_expected_lost_hours: mean(expected_lost_hours)
 }
