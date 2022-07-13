@@ -1,0 +1,50 @@
+// Likelihood that a ceasefire will start
+numSuccesses = 0 // no ceasefire so far
+numFailures = 138 // days since the 24th of February 
+numFutureTrials = 172 // days until end of year
+
+laplaceSuccessByNthTrial(successes, failures, numFutureTrials) = {
+  numTrialsAlready = successes + failures
+  numTrialsAtTheEnd = numTrialsAlready + numFutureTrials
+  pAllFailures = (failures + 1) / ( numTrialsAtTheEnd + 1)
+  // e.g., 10 trials, 10 failures, 0 successes
+  // then probability of one additional failure is:
+  // 11/12
+  // and the probability of three additional failures is:
+  // 11/12 * 12/13 * 13/14 = 11 / 14 =  (failures + 1) / ( numTrialsAtTheEnd + 1)
+  // e.g.: 3/4 * 4/5 * 5/6 * 6/7 * 7/8 = 3/8
+  1 - pAllFailures
+}
+chance_of_ceasefire = laplaceSuccessByNthTrial(numSuccesses, numFailures, numFutureTrials)
+
+// Likelihood that a ceasefire lasts
+
+// per laplace
+laplace(successes, failures) = (successes + 1)/( successes + failures + 2)
+chance_ceasefire_lasts_laplace = laplace(0,0)
+
+// per dataset of ceasefires 
+// (<https://docs.google.com/spreadsheets/d/1ufNP_iuTghzKGUCRPMoLY4-c9PibiNlVFEaAxyAad-A/edit#gid=315186780>)
+chance_ceasefire_lasts_historical = 0.3130434783
+
+// per dataset of ceasefires, restricted to Soviet conflicts (same link)
+chance_ceasefire_lasts_historical_russian = 0.4
+
+// per brief literature review (same link)
+chance_ceasefire_lasts_lit_review = 0.6392156863
+
+// overall guess
+distribution_ceasefire_lasts = mixture(chance_ceasefire_lasts_laplace, chance_ceasefire_lasts_historical, chance_ceasefire_lasts_historical_russian, chance_ceasefire_lasts_lit_review, [0.25, 0.3, 0.3, 0.15])
+chance_ceasefire_lasts = mean(distribution_ceasefire_lasts)
+
+// Result
+chance_successful_ceasefire = chance_of_ceasefire * chance_ceasefire_lasts
+// result: 0.256 = 25.6%
+
+// Display
+{
+  chance_of_ceasefire: chance_of_ceasefire,
+  chance_ceasefire_lasts: chance_ceasefire_lasts,
+  chance_successful_ceasefire:chance_successful_ceasefire
+}
+
