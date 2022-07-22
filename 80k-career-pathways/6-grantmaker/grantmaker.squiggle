@@ -1,0 +1,26 @@
+// Chance of getting into career path
+chanceYouGetMoney = 0.01 to 0.1
+
+// How much money
+advisorMoney = 100k to 2M
+officerMoneyFlow = 1M to 20M
+offficerYears = 5 to 20
+officerMoney = officerMoneyFlow * offficerYears
+howMuchMoney = mx(10k to 100k, advisorMoney, officerMoneyFlow, [0.5, 0.3, 0.2])
+
+// Impact of money
+giveDirectlyValueOfQALYsPerDollar = 1/(160 to 2700) // taken from some Sam Nolan estimates.
+multiplierOverGiveWell = 0.1 to 2M // see: https://forum.effectivealtruism.org/posts/GzmJ2uiTx4gYhpcQK/effectiveness-is-a-conjunction-of-multipliers
+shapleyMultiplier = 0.2 to 0.5
+
+// Aggregation
+valueOfGrantmaking = chanceYouGetMoney *
+  howMuchMoney *
+  giveDirectlyValueOfQALYsPerDollar *
+  multiplierOverGiveWell *
+  shapleyMultiplier
+
+// Display
+valueOfGrantmaking
+// 4.2B (0.12 to 15M)
+

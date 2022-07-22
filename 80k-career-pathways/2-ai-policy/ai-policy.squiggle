@@ -1,0 +1,20 @@
+// Subpar estimate for the value of the world
+steadyStatePopulation = 1B to 100B
+qalysPerPerson = 1
+discountingPerYear = 0.02
+valueOfWorldInQALYs = steadyStatePopulation * qalysPerPerson / discountingPerYear
+
+// Very rough estimates of the value of AI policy work
+chanceOfAttainingSomeMeasureOfPower = 0.01 to 0.1
+chanceOfPushingThroughAIPolicy = 0.01 to 0.1
+chancePolicyAffectsCounterfactualCatastrophe = mx(0.001 to 0.01, 0.01 to 0.1, [0.8, 0.2])
+uncertaintyInDirectionOfImpact = mx(-(0.1 to 1), 0.1 to 1, [0.2, 0.9])
+impactOfPolicyWork = chanceOfAttainingSomeMeasureOfPower * chanceOfPushingThroughAIPolicy * chancePolicyAffectsCounterfactualCatastrophe * uncertaintyInDirectionOfImpact
+
+// Aggregation
+valueOfPolicyWorkInQALYs = valueOfWorldInQALYs * impactOfPolicyWork
+// As before, this will be very much influenced by the discounting factor.
+
+// Display
+valueOfPolicyWorkInQALYs
+// 9.3M (-2.1M to 25M)

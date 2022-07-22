@@ -1,0 +1,24 @@
+// Operational challenges
+chanceOfAttainingTrustAndGettingFunding = 0.05 to 0.3
+chanceOfGettingAnOrganizationOfTheGround = 0.3 to 0.8
+
+// Estimate of impact
+yearlyOrganizationFunding = mx(100k to 10M, 5M to 50M, [0.9, 0.1])
+giveDirectlyValueOfQALYsPerDollar = 1/(160 to 2700) // taken from some Sam Nolan estimates.
+organizationValueMultiplier = 0.1 to 2M // see: https://forum.effectivealtruism.org/posts/GzmJ2uiTx4gYhpcQK/effectiveness-is-a-conjunction-of-multipliers
+shapleyMultiplier = 0.2 to 0.5
+lifetimeOfOrganization = mx(2 to 7, 5 to 50)
+
+// Aggregate
+totalValueOfEntrepeneurship = chanceOfAttainingTrustAndGettingFunding *
+  chanceOfGettingAnOrganizationOfTheGround *
+  yearlyOrganizationFunding *
+  giveDirectlyValueOfQALYsPerDollar *
+  organizationValueMultiplier *
+  lifetimeOfOrganization *
+  shapleyMultiplier
+
+// Display
+totalValueOfEntrepeneurship
+// 55B QALYs (16 to 1.2B)
+

@@ -1,0 +1,23 @@
+// Variables of interest
+numNewEAsPerYear = mx(0, 1 to 20, 20 to 200, [0.1, 0.8, 0.1])
+chanceEAbecomesHighlyEngaged = 0.1 to 0.5
+chanceHighlyEngagedEADoesSomething = 0.1 to 0.5
+distributionOfImpactForActiveHighlyEngagedEA = mx(10 to 10k, 1M to 100M, 10M to 500B,  [0.95, 0.04, 0.01])
+// ^ really pulling this out of my ass.
+// ^ Do not quote me on this, consider this a "stand-in" number.
+counterfactualDistributionOfImpactIfNotRecruited = 1 to 100
+// ^ also really pulling this one out of my ass
+// ^ Do not quote me on this, consider this a "stand-in" number.
+shapleyMultiplier = 0.1 to 0.5
+
+// Aggregate
+valueOfCommunityBuilders = numNewEAsPerYear *
+  chanceEAbecomesHighlyEngaged *
+  chanceHighlyEngagedEADoesSomething
+  (distributionOfImpactForActiveHighlyEngagedEA - counterfactualDistributionOfImpact) *
+  shapleyMultiplier
+
+// Display
+valueOfCommunityBuilders
+// 7M (-0.5 to 28K)
+

@@ -1,0 +1,24 @@
+// Subpar estimate for the value of the world
+steadyStatePopulation = 1B to 100B
+qalysPerPerson = 1
+discountingPerYear = 0.02
+valueOfWorldInQALYs = steadyStatePopulation * 
+  qalysPerPerson / 
+  discountingPerYear
+
+// Very rough estimates of the value of AI alignment work
+chanceOfGettingToStartingPoint = 0.1 to 0.9
+choosingWorthyResearchPath = 0.1 to 0.3
+chanceOfResearchPathSucceedingAtItsGoals = 0.01 to 0.1
+chanceOfResearchPathAvoidingCatastrophe = 0.01 to 0.2
+unconditionalChanceOfAvoidingCatastrophe = choosingWorthyResearchPath *
+  chanceOfResearchPathSucceedingAtItsGoals *
+  chanceOfResearchPathAvoidingCatastrophe
+
+// Combine both estimates
+valueOfAISafetyWorkInQALYs = valueOfWorldInQALYs * unconditionalChanceOfAvoidingCatastrophe
+// This will be really sensitive to the discounting per year, and can be conceived as a lower bound.
+
+// Display
+valueOfAISafetyWorkInQALYs 
+// 670M (5.9M to 2.5B); 
