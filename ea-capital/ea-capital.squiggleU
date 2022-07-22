@@ -64,7 +64,7 @@ pNoNewBillionnairesEver = 0.2
 
 chanceOfNewBillionnairePerYearOptimistic = utils.laplace(2, 2022 - 2007) // 2 billionnaires since GiveWell -> ~0.17 = 17%/year
 chanceOfNewBillionnairesPerYearRealistic = utils.laplace(2, 2022 - 1972) // 2 billionnaires since Singer's Famine, Affluence and Morality -> ~0.05 = 5%/year
-chanceOfNewBillionnairePerYear = 0.05 to 0.17 // toSampleSet(0.05 to 0.17) 
+chanceOfNewBillionnairePerYear = 0.05 to 0.17 // SampleSet.fromDist(0.05 to 0.17) 
 // overload the probability in the binomial! <- would be cool, but not doing right now.
 
 newBillionnaireMoney(t) = getNewBillionnaireMoney(t, chanceOfNewBillionnairePerYearOptimistic)

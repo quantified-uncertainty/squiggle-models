@@ -18,8 +18,8 @@ powIndependentSamples(dist, exponent) = {
   n = floor(exponent)
   remainder = exponent - n
   helperList = upTo(1,n)
-  dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * toSampleSet(dist) })
-  dist_to_the_remainder = toSampleSet(dist)^remainder
+  dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * SampleSet.fromDist(dist) })
+  dist_to_the_remainder = SampleSet.fromDist(dist)^remainder
   result = dist_to_the_nth_power * dist_to_the_remainder
   result
 }

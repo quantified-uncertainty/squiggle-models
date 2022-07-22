@@ -1,4 +1,4 @@
-// Define the log-uniform
+// Define the log-uniform 
 // (<https://en.wikipedia.org/wiki/Reciprocal_distribution>)
 loguniform(a, b) = exp(uniform(log(a), log(b)))
 
@@ -6,10 +6,14 @@ loguniform(a, b) = exp(uniform(log(a), log(b)))
 rate_of_formation_of_stars = loguniform(1,100)
 fraction_of_stars_with_planetary_systems = loguniform(0.1, 1)
 number_of_planets_per_solar_system_good_for_life = loguniform(0.1, 1)
-fraction_of_planets_in_which_any_life_appears = 0.5 
-// ^ lognormal({mean:0.5, stdev: 50}) ?? 
-// ^ Couldn't figure it out, just used the point estimate
-// ^ and emailed the authors.
+rate_of_life_formation = lognormal(1, 50)
+fraction_of_planets_in_which_any_life_appears = 10^(-36) to 1
+// 1 - exp(-rate_of_life_formation)
+// 0.01 to 1 according to Fods in the EAF.
+// ^ Tricky to figure out from the paper; I emailed one of the authors.
+fraction_of_planets_in_which_any_life_appears_as_sample_set = 1 - exp(-SampleSet.fromDist(rate_of_life_formation, 50k))
+// Same as the previous line, but wrapped in a “SampleSet.fromDist” operation and taking 10k samples,
+// which makes computation easier/more accurate in this case.
 fraction_of_planets_in_which_intelligent_life_appears = loguniform(0.001, 1)
 fraction_of_planets_which_dispatch_signals = loguniform(0.01, 1)
 length_of_time_signals_are_dispatched =  loguniform(100, 10000000000)
@@ -18,7 +22,7 @@ length_of_time_signals_are_dispatched =  loguniform(100, 10000000000)
 n = rate_of_formation_of_stars *
   fraction_of_stars_with_planetary_systems *
   number_of_planets_per_solar_system_good_for_life * 
-  fraction_of_planets_in_which_any_life_appears * 
+  fraction_of_planets_in_which_any_life_appears_as_sample_set * 
   fraction_of_planets_in_which_intelligent_life_appears * 
   fraction_of_planets_which_dispatch_signals *
   length_of_time_signals_are_dispatched

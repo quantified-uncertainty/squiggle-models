@@ -12,7 +12,7 @@ portion_consumed = 1 - portion_invested
 amount_consumed = portion_consumed * size_of_transfer_per_person
 
 # Defined from bayesian update
-baseline_consumption = toSampleSet(lognormal(5.6416553319135305, 0.013376219674031463))
+baseline_consumption = SampleSet.fromDist(lognormal(5.6416553319135305, 0.013376219674031463))
 duration_of_initial_consumption = 0.5 to 3
 log_increase_in_initial_consumption = (log(amount_consumed / duration_of_initial_consumption + baseline_consumption) - log(baseline_consumption)) * duration_of_initial_consumption
 return_on_investment = 0.05 to 0.30
