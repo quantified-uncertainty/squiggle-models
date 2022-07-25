@@ -9,7 +9,7 @@ utils = {
     // assume that min and max are integers.
     l = max - min
     meanF(t) = mean(fun(t))
-    intervals = map(upTo(0, (l/epsilon)), ({|n| min + n*epsilon}))
+    intervals = map(List.upTo(0, (l/epsilon)), ({|n| min + n*epsilon}))
     values = map(intervals, ({ |x | meanF(x)}))
     result = reduce(values, 0, ({|acc, x| acc + x})) * epsilon
     result
@@ -18,7 +18,7 @@ utils = {
   powIndependentSamples(dist, exponent) = {
     n = floor(exponent)
     remainder = exponent - n
-    helperList = upTo(1,n)
+    helperList = List.upTo(1,n)
     dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * SampleSet.fromDist(dist) })
     dist_to_the_remainder = SampleSet.fromDist(dist)^remainder
     result = dist_to_the_nth_power * dist_to_the_remainder
@@ -29,7 +29,7 @@ utils = {
     distDependent = toSamplesSet(dist)
     n = floor(exponent)
     remainder = exponent - n
-    helperList = upTo(1,n)
+    helperList = List.upTo(1,n)
     dist_to_the_nth_power = reduce(helperList, 1, {|acc, _| acc * distDependent })
     dist_to_the_remainder = distDependent^remainder
     result = dist_to_the_nth_power * dist_to_the_remainder
