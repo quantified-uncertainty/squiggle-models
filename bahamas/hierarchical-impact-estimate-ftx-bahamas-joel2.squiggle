@@ -61,7 +61,7 @@ utility = {
         },
         collaborations: {
             numpeople: truncate(normal(20,8),10,35),// at any one time
-            rangenumpeople: upTo(10, 35),
+            rangenumpeople: List.upTo(10, 35),
             //numpairs: numpeople! / (2! * (numpeople - 2)!),
             colaborationprobperpairperday: 0.0002 to 0.003, // how many pairs of people?
             colaborationcounterfactual: truncate(normal(0.3,0.6), 0, 1),
