@@ -1,0 +1,32 @@
+current_q = 1.25
+
+// Conditional on it scaling, how long would it take?
+improvement_in_q_to_engineering_breakeven = 100 to 10k // ~1k, with some uncertainty
+time_to_engineering_breakeven = (2 to 20) // if it happens 
+
+improvement_in_q_to_commercia_breakeven = 5 to 1k
+time_to_commercial_breakeven = 3 to 15  
+
+time_of_construction = 3 to 15
+
+total_time = time_to_engineering_breakeven + 
+  time_to_commercial_breakeven + 
+  time_of_construction
+
+// Will current approaches scale to commercialization
+
+p_scalability_dist = 0.2 to 0.5
+p_scalability = mean(p_scalability_dist)
+// cdf(total_time, 20)
+
+p_by_time(t) = { // t=0 is now
+  p_if_scales = cdf(total_time, t)
+  p = p_if_scales * p_scalability
+  p
+}
+
+
+{
+  p_by_time: p_by_time,
+  caveat: "This is a really simple model. At most, it should be good for the next 10-30 years. But after that, uncertainty about new approaches—e.g., new fussion reactor types—dominates."
+}
