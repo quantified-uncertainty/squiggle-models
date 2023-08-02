@@ -4,7 +4,7 @@
 
 ## Pathway to impact
 
-Go to good school -> Get into politics -> Suck dick -> Get position of power -> Implement good AI governance ideas.
+Go to good school -> Get into politics -> Get position of power -> Implement good AI governance ideas.
 
 ## Estimation strategy
 
